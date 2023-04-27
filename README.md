@@ -1,5 +1,241 @@
 # 권용대 602377103
 
+## 2023/04/27 9주차
+
+### ___기본그래프___
+  * 데이터가 포함하고 있는 정보를 이해하기 쉽게 표현하는 과정을 데이터 시각화라고 한다.
+
+___막대그래프___
+  * 막대그래프는 그룹별로 집계된 데이터를 표현하는 도구이다.  
+
+___막대그래프 작성___
+```R
+ds <- table(favorite)               #도수분포표 저장
+ds                                  #도수분포표 내용 확인
+barplot(ds, main="favorite season") #막대그래프 작성
+```
+  * barplot의 매개변수 : 그래프로 표현할 테이블 지정, main : 그래프 제목
+
+___막대그래프 색 지정___
+```R
+barplot(ds, main="favorite season", col="blue") #막대 색 지정
+```
+  * 색 지정 방법 : blue, red와 같이 색 이름 입력, #0000FF와 같이 색 코드 입력, rgb를 이용한 색 조합
+
+___막대별로 색을 다르게 지정___
+  * 막대별로 색을 다르게 하려면 막대 개수만큼 색을 지정한다.
+```R
+barplot(ds, main="favorite season", col=c("blue", "red", "green", "yellow")) #막대 색을 각각 지정
+```
+
+___팔레트에서 색을 선택해 사용___
+  * 팔레트 기능은 막대 수 만큼 색을 지정하는 번거로움을 용이하게 하는 기능이다.
+  * 다양한 색을 미리 준비하고 그곳에서 필요한 수만큼 색을 가져와 사용한다.
+  * rainbow, heat.colors, topo.colors, cm.colors 함수가 대표적이다.
+```R
+barplot(ds, main="favorite season", col=rainbow(4)) #막대 색을 rainbow 팔레트에서 지정
+```
+
+___X축, Y축에 설명 붙이기___
+```R
+barplot(ds, main="favorite season",
+        col="green",     #막대 색 지정
+        xlab="계절",     #X축 설명
+        ylab="빈도수")   #Y축 설명
+```
+
+___그래프 막대를 수평 방향으로 출력___
+```R
+barplot(ds, main="favorite season",
+        col="green",   #막대 색 지정
+        horiz=TRUE)    #수평 방향으로 출력
+```
+
+___X축 그룹 이름 변경___
+```R
+barplot(ds, main="favorite season",
+        col="yellow",                    #막대 색 지정
+        names=c("FA", "SP", "SU", "WI")) #X축 그룹 이름 변경
+```
+
+___X축 그룹 이름 세로로 출력___
+```R
+barplot(ds, main="favorite season",
+        col="yellow", #막대 색 지정
+        las=2)        #X축 그룹 이름을 수직으로
+```
+  * 매개변수 las : 0/축 방향, 1/수평 방향(축 방향 상관 X), 2/축을 기준으로 수직, 3/수직 방향(축 방향 상관 X)
+
+___중첩 그룹의 막대그래프___
+  * 그룹 안에 다른 그룹이 존재하는 경우에 사용한다.
+```R
+#데이터 입력
+age.A <- c(13709, 10974, 7979, 5000, 4250)
+age.B <- c(17540, 29701, 36209, 33947, 24487)
+age.C <- c(991, 2195, 5366, 12980, 19007)
+
+ds <- rbind(age.A, age.B, age.C)
+colnames(ds) <- c("1970", "1990", "2010", "2030", "2050")
+ds
+
+#그래프 작성
+barplot(ds, main="인구 추정")
+```
+
+___연령대별로 색을 다르게 지정___
+```R
+barplot(ds, main="인구 추정",
+        col=c("green", "blue", "yellow"))
+```
+  * 그래프 기준 아래에서 위쪽 방향으로 색이 지정된다.
+
+___연령대를 각각의 막대로 표현___
+```R
+barplot(ds, main="인구 추정",
+        col=c("green", "blue", "yellow"),
+        beside=TRUE)
+```
+
+___막대그래프에 범례 추가___
+```R
+barplot(ds, main="인구 추정",
+        col=c("green", "blue", "yellow"),
+        beside=TRUE,
+        legend.text=T)
+```
+
+___범례를 그래프 밖에 표시___
+```R
+par(mfrow=c(1, 1), mar=c(5, 5, 5, 7))
+barplot(ds, main="인구 추정",
+        col=c("green", "blue", "yellow"),
+        beside=TRUE,
+        legend.text=T,
+        args.legend = list(x="topright", bty="n", inset=c(-0.25,0)))
+```
+
+___범례의 내용 변경___
+```R
+barplot(ds, main="인구 추정",
+        col=c("green", "blue", "yellow"),
+        beside=TRUE,
+        legend.text=c("0~14세", "15~64세", "65세 이상"))
+```
+
+### ___히스토그램___
+  * 막대 그래프와 비슷한 그래프로, 그룹이 명시적으로 존재하지 않는 수치형 자료의 분포를 시각화할 때 사용한다.
+  * hist 함수를 사용해 작성한다
+  * 일반적으로 막대 사이에 간격이 있으면 막대그래프, 간격이 없으면 히스토그램으로 구분한다.
+  * 막대그래프는 막대의 면적이 의미가 없지만 히스토그램은 막대 면적의 의미가 있다.
+```R
+head(cars)
+dist <- cars[,2]                    #자동차 제동거리
+dist
+hist(dist,                          #data
+     main="Histogram for 제동거리", #제목
+     xlab="제동거리",               #X축 레이블
+     ylab="빈도수",                 #Y축 레이블
+     border="blue",                 #막대 테두리 색
+     col="green",                   #막대 색
+     las=2,                         #X축 글씨 방향
+     breaks=5)                      #막대 개수 조절
+```
+
+___구간별 빈도수를 도수분포표 형태로 출력___
+```R
+result <- hist(dist,                          #data
+               main="Histogram for 제동거리", #제목
+               breaks=5)                      #막대 개수 조절
+result
+freq <- result$counts                         #구간별 빈도수 저장
+names(freq) <- result$breaks[-1]              #구간값을 이름으로 지정
+freq                                          #구간별 빈도수 출력
+```
+
+___다중그래프___
+  * 하나의 창에 여러 개의 그래프를 동시에 출력해 비교할 수 있다.
+```R
+par(mfrow=c(2,2), mar=c(3, 3, 4, 2))    #화면 분할
+
+hist(iris$Sepal.Length,                 #그래프1
+     main="Sepal.Length",
+     col="orange")
+
+barplot(table(mtcars$cyl),              #그래프2
+        main="mtcars",
+        col=c("red", "green", "blue"))
+
+barplot(table(mtcars$gear),             #그래프3
+        main="mtcars",
+        col=rainbow(3),
+        horiz=TRUE)
+
+pie(table(mtcars$cyl),                  #그래프4
+    main="btcars",
+    col=topo.colors(3),
+    radius=2)
+
+par(mfrow=c(1,1), mar=c(5, 4, 4, 2)+.1) #화면 분할 취소
+```
+
+___그래프를 파일에 저장___
+  1. 플롯창에 생성된 그래프에 우클릭 후 그래프를 복사해 다른 파일에 저장한다. (팝업창에 표시된 크기대로 복사된다)
+  2. 플롯창에 생성된 그래프에 우클릭 후 Save Image as를 클릭해 이미지로 저장한다.
+  3. 플롯창의 Export 메뉴를 클릭해 원하는 확장자로 저장한다.
+
+### ___원그래프___
+  * 원그래프는 하나의 원 안에 데이터값이 차지하는 비율을 넓이로 나타낸 그래프이다.
+```R
+#데이터 입력
+favorite <- c("WINTER", "SUMMER", "SPRING", "SUMMER",
+              "SUMMER", "FALL", "FALL", "SUMMER", "SPRING", "SPRING")
+ds <- table(favorite)               #도수분포표 저장
+ds                                  #도수분포표 내용 확인
+
+pie(ds, main="선호 계절",           #원그래프 작성
+    radius=1)                      #조각 크기 지정
+```
+
+___원그래프 조각 색 지정___
+```R
+pie(ds, main="선호 계절",                    #원그래프 작성
+    col=c("brown", "green", "red", "black"), #조각 색 지정
+    radius=1)                                #조각 크기 지정
+```
+
+___3차원 원그래프 작성___
+```R
+install.packages("plotrix")                     #패키지 인스톨
+
+library(plotrix)                                #패키지 로드
+
+pie3D(ds, main="선호 계절",
+      labels=names(ds),                         #조각별 레이블 지정
+      labelcex=1.0,                             #레이블 폰트 크기
+      explode=0.1,                              #조각 간 간격
+      radius=1.5,                               #조각의 크기
+      col=c("brown", "green", "red", "yellow")) #조각의 색 지정
+```
+
+### ___선그래프___
+  * 일반적으로 시간의 변화에 따라 수집된 데이터를 시각화하는 데 주로 사용된다.
+  * 시간 변화에 따라 데이터를 수집한 경우 이를 시계열 데이터라고 부른다.
+
+___하나의 선그래프 작성___
+```R
+month <- 1:12                        #데이터 입력
+late <- c(5,8,7,9,4,6,12,13,8,6,6,4) #데이터 입력
+plot(month,                          #X 데이터
+     late,                           #Y 데이터
+     main="지각생 통계",              #제목
+     type="l",                       #그래프 종류 선택(알파벳)
+     lty=1,                          #선의 종류 선택
+     lwd=1,                          #선의 굵기 선택
+     xlab="Month",                   #X축 레이블
+     ylab="Late cnt")                #Y축 레이블
+```
+
+---
 ## 2023/04/13 7주차
 
 ___실행 결과를 파일로 출력하기___
