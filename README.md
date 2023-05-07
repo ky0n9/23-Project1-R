@@ -1,5 +1,173 @@
 # 권용대 602377103
+## 2023/05/04 10주차
+___복수의 선그래프 작성___
+```R
+month <- 1:12                          #데이터 입력
+late1 <- c(5,8,7,9,4,6,12,13,8,6,6,4)  #데이터 입력
+late2 <- c(4,6,5,8,7,8,10,11,6,5,7,3)  #데이터 입력
+plot(month,                            #X 데이터
+     late1,                            #Y 데이터
+     main="Late Students",             #제목
+     type="b",                         #그래프 종류 선택(알파벳)
+     lty=1,                            #선의 종류 선택
+     col="red",                        #선의 색상
+     xlab="Month",                     #X축 레이블
+     ylab="Late cnt")                  #Y축 레이블
+lines(month,                           #X 데이터
+      late2,                           #Y 데이터
+      type="b",                        #선의 종류 선택
+      col="blue")                      #선의 색상
+```
 
+### ___상자그림___
+  * 사분위수를 시각화하여 그래프 형태로 나타낸 것이다.
+  * 하나의 그래프로 데이터의 분포 형태를 포함, 다양한 정보를 전달하기 때문에 단일변수 수치형 자료를 파악하는데 자주 사용한다.
+```R
+dist <- cars[,2] #자동차 제동거리(ft)
+boxplot(dist, main="자동차 제동거리")
+```
+  * 데이터의 전반적인 분포를 이해하는데 도움이 된다.
+  * 구체적인 최솟값, 최댓값, 중앙값 등이 정확히 알기 어렵다.
+  * boxplot.stats() 함수를 이용해 해당 값을 리스트 형태로 출력한다.
+```R
+boxplot.stats(dist)
+```
+
+___그룹이 있는 데이터의 상자그림___
+```R
+boxplot(Petal.Length~Species,             #데이터와 그룹 정보
+        data=iris,                        #데이터가 저장된 자료구조
+        main="품종별 꽃잎의 길이",        #그래프의 제목
+        col=c("green", "yellow", "blue")) #상자들의 색
+```
+
+### ___산점도___
+  * 다중변수 데이터에서 두 변수에 포함된 값들을 2차원 그래프상에 점으로 표현하여 분표를 관찰하는 도구이다.
+  * 데이터의 주제를 통계 용어로 변수라고 한다.
+
+___두 변수 사이의 산점도___
+```R
+wt <- mtcars$wt               #중량 데이터
+mpg <- mtcars$mpg             #연비 데이터
+plot(wt, mpg,                 #X축, Y축 2개의 변수
+     main="중량-연비 그래프", #제목
+     xlab="중량",             #X축 레이블
+     ylab="연비(MPG)",        #Y축 레이블
+     col="red",               #point의 색
+     pch=19)                  #point의 종류
+```
+
+___여러 변수들 간의 산점도___
+```R
+vars <- c("mpg", "disp", "drat", "wt") #대상 변수
+target <- mtcars[,vars]                #대상 데이터 생성
+head(target)
+plot(target,                           #대상 데이터
+     main="Multi plots")
+```
+
+___그룹 정보가 있는 2개 변수의 산점도___
+```R
+iris.2 <-iris[,3:4]                #데이터 준비
+levels(iris$Species)               #그룹 확인
+group <- as.numeric(iris$Species)  #점의 모양과 색
+group                              #group 내용 출력
+color <- c("red", "green", "blue") #점의 색상
+plot(iris.2,
+     main="Iris plot",
+     pch=c(group),
+     col=color[group])
+```
+```R
+#범례 추가
+plot(iris.2,
+     main="Iris plot",
+     pch=c(group),
+     col=color[group])
+
+legend(x="bottomright",               #범례의 위치
+       legend=levels(iris$Species),   #범례의 내용
+       col=c("red", "green", "blue"), #색 지정
+       pch=c(1:3))                    #점의 모양
+```
+
+### ___데이터 분석___
+___데이터 분석 절차___
+  1. 문제 정의 및 계획
+  2. 데이터 수집
+  3. 데이터 정제 및 전처리
+  4. 데이터 탐색
+  5. 데이터 분석
+  6. 결과 보고
+
+___탐색적 데이터 분석의 이해___
+  * 수집된 데이터의 내용을 이해하기 위한 기초 분석 단계
+  * 데이터는 수집 주제의 개수에 따라 1차원 데이터와 2차원 데이터로 나뉜다.
+  * 수집 주제는 통계에서 [변수]라는 용어로 정의한다.
+  * 수집 주제가 하나인 1차원 데이터는 단일변수 데이터(일변량 데이터)라고 한다.
+  * 여러 주제에 대한 데이터를 하나로 모은 2차원 데이터는 다중변수 데이터(다변량 데이터)라고 한다.
+
+___단일 변수 범주형 데이터 분석___
+```R
+install.packages("carData")
+library(carData)
+
+#1.데이터 준비
+room.class <- TitanicSurvival$passengerClass #선실 정보
+room.class
+
+#2. 도수분포 계산
+tbl <- table(room.class)
+tbl
+sum(tbl)      #전체 탑승객 수
+
+#3. 막대그래프 작성
+barplot(tbl, main="선실별 탑승객",
+        xlab="선실 등급",
+        ylab="탑승객수",
+        col=c("blue", "green", "yellow"))
+
+#4. 원그래프 작성
+tbl/sum(tbl)
+par(mar=c(1,1,4,1))
+pie(tbl, main="선실별 탑승객",
+    col=c("blue", "green", "yellow"))
+par(mar=c(5.1,4.1,41.,2.1))
+```
+___단일 변수 수치형 데이터 분석___
+```R
+#1. 데이터 준비
+grad <- state.x77[, "HS Grad"]  #주별 고등학교 졸업률
+grad
+
+#2. 사분위수
+summary(grad)
+var(grad)
+sd(grad)
+
+#3. 히스토그램
+hist(grad, main="주별 졸업률",
+     xlab="졸업률",
+     ylab="주의 개수",
+     col="orange")
+
+#4. 상자그림
+boxplot(grad, main="주별 졸업률",
+        col="orange")
+
+#5. 졸업률이 가장 낮은 주
+idx <- which(grad==min(grad))
+grad[idx]
+
+#6. 졸업률이 가장 높은 주
+idx <- which(grad==max(grad))
+grad[idx]
+
+#7. 졸업률이 평균 이하인 주
+idx <- which(grad<mean(grad))
+grad[idx]
+```
+---
 ## 2023/04/27 9주차
 
 ### ___기본그래프___
