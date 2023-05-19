@@ -1,4 +1,138 @@
 # 권용대 602377103
+## 2023/05/18 12주차
+### ___정렬___
+  * [정렬]은 주어진 기준에 따라 데이터를 재배열하는 과정이다.
+
+___벡터의 정렬___
+```R
+#벡터의 정렬
+v1 <- c(1, 7, 6, 8, 4, 2, 3)
+v1 <- sort(v1)               #오름차순
+v1
+v2 <- sort(v1, decreasing=T) #내림차순
+v2
+```
+```R
+name <- c("정대일", "강재구", "신현석", "홍길동")
+sort(name)               #오름차순
+sort(name, decreasing=T) #내림차순
+```
+```R
+#order를 이용한 정렬
+name <- c("정대일", "강재구", "신현석", "홍길동")
+order(name)               #오름차순
+order(name, decreasing=T) #내림차순
+
+idx <- order(name)
+name[idx]          #오름차순
+```
+
+___매트릭스와 데이터프레임의 정렬___
+```R
+head(iris)
+order(iris$Sepal.Length)
+iris[order(iris$Sepal.Length),]                             #오름차순 정렬
+iris[order(iris$Sepal.Length, decreasing=T),]               #내림차순 정렬
+iris.new <- iris[order(iris$Sepal.Length),]                 #정렬된 데이터를 저장
+head(iris.new)
+iris[order(iris$Species, decreasing=T, iris$Petal.Length),] #정렬 기준이 2개
+```
+
+___샘플링___
+  * [샘플링]이란, 주어진 값들이 있을 때 그 중에서 임의의 개수만큼 값들을 추출하는 작업을 말한다.
+  * 한 번 추출한 것을 제외하고 추출하는 것을 비복원 추출, 다시 포함해 추출하는 방식을 복원 추출이라고 한다.
+  * sample() 함수는 임의 추출이기 때문에 실행할 때 마다 결과가 다르다.
+```R
+#샘플링
+x <- 1:100
+y <- sample(x, size=10, replace = FALSE) #비복원 추출
+y
+```
+```R
+#데이터 셋에서 50개의 행 추출
+idx <- sample(1:nrow(iris), size=50, replace = F)
+iris.50 <- iris[idx,]      #50개의 행 추출
+dim(iris.50)               #행과 열의 개수 확인
+head(iris.50)
+```
+
+___조합___
+  * [조합]은 주어진 데이터값 중에서 몇 개씩 짝을 지어 추출하는 작업이다.
+  * combn() 함수가 사용된다.
+```R
+#조합
+combn(1:5, 3)         #1~5에서 3개를 추출하는 조합
+
+x <- c("red", "green", "blue", "black", "white")
+com <- combn(x, 2)    #X의 원소를 2개 추출하는 조합
+com
+
+for(i in 1:ncol(com)) #조합을 출력
+{
+  cat(com[,i], "\n")
+}
+```
+
+___데이터 집계___
+  * 2차원 데이터는 데이터 그룹에 대해 합계나 평균을 계산할 일이 많다. 이러한 작업을 [집계]라고 한다.
+  * R에서는 aggregate()함수를 사용한다.
+```R
+#품종별 꽃잎 꽃받침의 폭과 길이의 평균
+agg <- aggregate(iris[,-5], by=list(iris$Species),
+                 FUN=mean)
+agg
+```
+```R
+#품종별 꽃잎 꽃받침의 폭과 길이의 표준편차
+agg <- aggregate(iris[,-5], by=list(품종=iris$Species),
+                 FUN=sd)
+agg
+```
+```R
+#2개의 기준에 대해 다른 열들의 최댓값
+head(mtcars)
+agg <- aggregate(mtcars, by=list(cyl=mtcars$cyl),
+                 vs=mtcars$vs, FUN=max)
+agg
+```
+
+### ___고급 그래프 작성___
+___나무 지도___
+  * [데이터 시각화]는 데이터 분석 과정에서 가장 중요한 기술 중 하나다.
+  * [나무 지도]는 사각 타일의 형태로 표현되는 시각화 도구이다.
+  * 데이터의 정보를 타일의 크기와 색으로 나타낼 수 있다.
+  * 타일들은 계층 구조로 되어 있어, 데이터에 존재하는 계층 구조까지 표현할 수 있다.
+```R
+install.packages(("treemap")) #treemap 패키지 설치
+library(treemap)              #treemap 패키지 불러오기
+
+#GNI2014 데이터셋을 사용한 나무지도
+data(GNI2014)                         #데이터 불러오기
+head(GNI2014)                         #데이터 내용 보기
+treemap(GNI2014,
+        index=c("continent", "iso3"), #계층 구조 설정(대륙-국가)
+        vSize="population",           #타일의 크기
+        vColor="GNI",                 #타일의 컬러
+        type="value",                 #타일 컬러링 방법
+        bg.labels = "yellow",         #레이블의 배경색
+        title="World's GNI")          #나무지도 제목
+```
+```R
+#state.x77 데이터셋을 사용한 나무지도
+library(treemap)                            #treemap 패키지 불러오기
+st <- data.frame(state.x77)                 #매트릭스를 데이터프레임으로 변환
+st <- data.frame(st, stname=rownames(st))   #주의 이름 열 stname 추가
+
+treemap(st,
+        index=c("stname"),                  #타일에 주 이름 표기
+        vSize="Area",                       #타일의 크기
+        vColor="Income",                    #타일의 컬러
+        type="value",                       #타일 컬러링 방법
+        title="USA states area and income") #나무지도 제목
+```
+
+
+---
 ## 2023/05/11 11주차
 
 ___두 변수의 상관관계___
